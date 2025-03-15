@@ -1,5 +1,7 @@
 #!/bin/bash
 
+## SCRIPT PARA CONFIGURAR O BANCO DE DADOS UTILIZANDO O POSTGRESQL
+
 ## nome do usuário
 u=devpython
 

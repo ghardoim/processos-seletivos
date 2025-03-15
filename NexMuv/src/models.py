@@ -1,6 +1,7 @@
 from sqlalchemy import String, Column, Integer, Numeric, ForeignKey, TIMESTAMP
 from sqlalchemy.orm import relationship, declarative_base
 
+# CRIAÇÃO DOS MODELOS DAS TABELAS COM AS MESMAS CONFIGURAÇÕES DO ARQUIVO SQL PROVIDO
 Base = declarative_base()
 
 class Product(Base):
