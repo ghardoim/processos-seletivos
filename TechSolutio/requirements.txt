@@ -1,0 +1,8 @@
+gunicorn
+pydantic
+dotenv
+flask
+redis
+langchain
+google-generativeai
+langchain-google-genai

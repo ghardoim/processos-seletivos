@@ -1,0 +1,32 @@
+version: "0.1"
+
+services:
+
+  redis:
+    image: redis:7-alpine
+    container_name: techsolutio-redis
+    ports:
+      - "6379:6379"
+
+  flask:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: techsolutio-flask
+    ports:
+      - "8000:5000"
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - redis
+
+  worker:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.worker
+    container_name: techsolutio-worker
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - redis
+      - flask
