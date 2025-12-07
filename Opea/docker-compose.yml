@@ -1,0 +1,11 @@
+version: "3.9"
+
+services:
+  pipeline:
+    build: .
+    container_name: opea_pipeline
+    env_file:
+      - .env
+    volumes:
+      - ./:/app
+    command: ["python", "src/pipeline.py", "--input", "/app/data/dados_entrada.xlsx"]

@@ -1,0 +1,31 @@
+FROM python:3.10-slim
+
+# Instalamos Java para o Spark/Delta (default JRE headless)
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends default-jre-headless curl && \
+    rm -rf /var/lib/apt/lists/*
+
+ENV JAVA_HOME=/usr/lib/jvm/default-java
+ENV PATH="$JAVA_HOME/bin:${PATH}"
+ENV PYTHONPATH=/app
+ENV SPARK_VERSION=3.5.1
+ENV HADOOP_VERSION=3
+ENV SPARK_CLASSPATH=/opt/spark/jars/hadoop-aws-3.3.4.jar:/opt/spark/jars/aws-java-sdk-bundle-1.12.262.jar
+ENV PYSPARK_SUBMIT_ARGS="--driver-class-path /opt/spark/jars/hadoop-aws-3.3.4.jar:/opt/spark/jars/aws-java-sdk-bundle-1.12.262.jar --jars /opt/spark/jars/hadoop-aws-3.3.4.jar,/opt/spark/jars/aws-java-sdk-bundle-1.12.262.jar pyspark-shell"
+
+WORKDIR /app
+
+# Copiamos dependências primeiro para aproveitar cache
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Baixamos jars necessários para s3a (hadoop-aws e aws-sdk-bundle)
+RUN mkdir -p /opt/spark/jars && \
+    curl -L -o /opt/spark/jars/hadoop-aws-3.3.4.jar https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-aws/3.3.4/hadoop-aws-3.3.4.jar && \
+    curl -L -o /opt/spark/jars/aws-java-sdk-bundle-1.12.262.jar https://repo1.maven.org/maven2/com/amazonaws/aws-java-sdk-bundle/1.12.262/aws-java-sdk-bundle-1.12.262.jar
+
+# Copiamos o restante do código
+COPY . .
+
+# Comando padrão (pode ser sobrescrito pelo docker-compose)
+CMD ["python", "src/pipeline.py", "--input", "/app/data/dados_entrada.xlsx"]
